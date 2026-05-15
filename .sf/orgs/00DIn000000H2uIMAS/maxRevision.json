@@ -1,0 +1,24 @@
+{
+    "fileVersion": 0,
+    "serverMaxRevisionCounter": 3182,
+    "sourceMembers": {
+        "ExperienceBundle__SDO_Partner_Central1": {
+            "memberType": "ExperienceBundle",
+            "serverRevisionCounter": 3182,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSet__sfdcInternalInt__sfdc_scrt2": {
+            "memberType": "PermissionSet",
+            "serverRevisionCounter": 33,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSet__sfdcInternalInt__sfdc_accelerate_dms": {
+            "memberType": "PermissionSet",
+            "serverRevisionCounter": 89,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        }
+    }
+}

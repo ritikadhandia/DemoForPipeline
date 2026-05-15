@@ -6,13 +6,13 @@ on:
     branches:
       - "UAT"
     paths:
-      - 'src/**'
+      - 'force-app/main/default/**'
     
   push:
     branches:
       - "UAT"
     paths:
-      - 'src/**'
+      - 'force-app/main/default/**'
     
  
 jobs:
@@ -172,7 +172,7 @@ jobs:
                 $TEST_TYPE = $env:TEST_TYPE
                 Write-Host "TEST_TYPE : $TEST_TYPE"
                 Write-Host "TEST_TYPE : $env:TEST_TYPE"
-                $srcFolder = "delta/src"
+                $srcFolder = "delta/force-app/main/default"
                 if ($isDestructiveFound -eq "True") {
                   Write-Host "Validating Destructive changes"
                   if (-Not (Test-Path -Path $srcFolder)) {
