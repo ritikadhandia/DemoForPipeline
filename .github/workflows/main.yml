@@ -1,0 +1,221 @@
+name: Validate/Deploy Code into Salesforce UAT ORG
+ 
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - "UAT"
+    paths:
+      - 'src/**'
+    
+  push:
+    branches:
+      - "UAT"
+    paths:
+      - 'src/**'
+    
+ 
+jobs:
+    Run-Validation:
+        runs-on: ubuntu-latest
+        env:
+          CONSUMERKEYUAT: ${{ secrets.CONSUMERKEY }}
+          USERNAMEUAT: ${{ secrets.USERNAME }}
+          URLUAT: ${{ secrets.URL }}
+          CONSUMERKEYPROD: ${{ secrets.CONSUMERKEYPROD }}
+          USERNAMEPROD: ${{ secrets.USERNAMEPROD }}
+          URLPROD: ${{ secrets.URLPROD }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        steps:
+            - uses: actions/setup-node@v4
+              with:
+                node-version: '20'
+ 
+            - name: 'Checkout source code'
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+            # Now Install Salesforce CLI
+            - name: 'Install Salesforce CLI'
+              run: |
+                  wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
+                  mkdir -p ~/cli/sf
+                  tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
+                  echo "$HOME/cli/sf/bin" >> $GITHUB_PATH
+                  ~/cli/sf/bin/sfdx version
+            
+            # Code Scanner Starts
+            - name: 'Installing sfdx git delta'
+              run: |
+                  echo y | sfdx plugins:install sfdx-git-delta
+                  sfdx plugins
+            - name: Generate SFDX Git Delta
+              shell: pwsh
+              run: |
+                # Determine previous commit ID
+                $prevCommitId = ""
+                if ($env:COMMIT_ID -and $env:COMMIT_ID.Trim() -ne "") {
+                    $prevCommitId = $env:COMMIT_ID.Trim()
+                }
+                else {
+                    # Get the parent commit of HEAD
+                    $prevCommitId = git rev-parse HEAD^
+                }
+                Write-Host "Previous Commit ID : $prevCommitId"
+                Write-Host "Event name : $($env:GITHUB_EVENT_NAME)"
+
+                # Create the delta folder if it doesn't exist
+                if (-Not (Test-Path -Path "delta")) {
+                    New-Item -ItemType Directory -Path "delta" | Out-Null
+                }
+
+                # Generate delta using the Salesforce CLI plugin
+                sfdx sgd:source:delta --from $prevCommitId --output delta/ --generate-delta
+
+                # Check for destructive changes
+                $destructivePath = "delta/destructiveChanges/destructiveChanges.xml"
+                if (Test-Path $destructivePath) {
+                    $destructiveChanges = Get-Content $destructivePath
+                    $destructiveChangesCheck = $destructiveChanges | Out-String
+                    if (($destructiveChangesCheck.Contains("<members>")) -and ($destructiveChangesCheck.Contains("<types>"))) {
+                        Write-Host "Destructive Changes found"
+                        echo "isDestructive=True" >> $env:GITHUB_ENV
+                    }
+                    else {
+                        Write-Host "No Destructive Changes found"
+                        echo "isDestructive=False" >> $env:GITHUB_ENV
+                    }
+                }
+                else {
+                    Write-Host "Destructive changes file not found."
+                    echo "isDestructive=False" >> $env:GITHUB_ENV
+                }
+                
+                # Move package.xml to delta/src if needed
+                $sourcePath = "delta/package/package.xml"
+                $destinationPath = "delta/src"
+                if (Test-Path -Path $destinationPath) {
+                    Write-Host "Moving package.xml to delta/src"
+                    Move-Item -Path $sourcePath -Destination $destinationPath
+                }
+            - name: Get PR Description
+              if: github.event_name == 'pull_request'
+              id: get_pr_description
+              run: |
+                PR_NUMBER=${{ github.event.pull_request.number }}
+                echo "PR_NUMBER: $PR_NUMBER"
+                REPO=${{ github.repository }}
+                echo "REPO: $REPO"
+                API_URL="https://api.github.com/repos/$REPO/pulls/$PR_NUMBER"
+                echo "API_URL: $API_URL"
+                DESCRIPTION=$(curl -s -H "Authorization: token $GITHUB_TOKEN" $API_URL | jq -r '.body')
+                echo "PR Description: $DESCRIPTION"
+
+                # Default Test Class Type
+                TEST_CLASS_TYPE=""
+
+                if [[ "$DESCRIPTION" == *"RunSpecifiedTest"* ]]; then
+                  TEST_CLASSES=$(echo "$DESCRIPTION" | sed -n 's/RunSpecifiedTest //p' | xargs) # Trim spaces
+                  TEST_CLASS_TYPE="-l RunSpecifiedTests"
+
+                  if [[ -n "$TEST_CLASSES" ]]; then  # Check if test classes exist
+                    IFS=',' read -ra TEST_ARRAY <<< "$TEST_CLASSES"  # Split by comma into an array
+                    for test in "${TEST_ARRAY[@]}"; do
+                      TEST_CLASS_TYPE+=" --tests $test"
+                    done
+                  fi
+
+                  TEST_CLASS_TYPE+=" --dry-run"
+
+                elif [[ "$DESCRIPTION" == *"RunLocalTest"* ]]; then
+                  TEST_CLASS_TYPE="-l RunLocalTests --dry-run"
+                else
+                  TEST_CLASS_TYPE="--dry-run"  # Explicit 'else' condition
+                fi
+
+                echo "Final Test Class Type: $TEST_CLASS_TYPE"
+                echo "TEST_TYPE=$TEST_CLASS_TYPE" >> "$GITHUB_ENV"
+            - name: 'Authenticate to  Salesforce Org'
+              run: |
+                if [ "${{ github.event_name }}" = "pull_request" ]; then
+                  TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+                elif [ "${{ github.event_name }}" = "push" ]; then
+                  TARGET_BRANCH="${{ github.ref_name }}"
+                else
+                  echo "Unsupported event: ${{ github.event_name }}"
+                  exit 1
+                fi
+                if [ "$TARGET_BRANCH" = "SIT" ]; then
+                    # Run script for PR raised against "SIT" branch or direct commit/merge into "SIT" branch
+                    sf org login jwt --client-id $CONSUMERKEYSIT --jwt-key-file Assets/server.key --username $USERNAMESIT --instance-url $URLSIT
+                    echo "sfusername=$USERNAMESIT" >> $GITHUB_ENV
+                elif [ "$TARGET_BRANCH" = "UAT" ]; then
+                    # Run script for PR raised against "UAT" branch or direct commit/merge into "UAT" branch
+                    sf org login jwt --client-id $CONSUMERKEYUAT --jwt-key-file Assets/server.key --username $USERNAMEUAT --instance-url $URLUAT
+                    echo "sfusername=$USERNAMEUAT" >> $GITHUB_ENV
+                 elif [ "$TARGET_BRANCH" = "main" ]; then
+                    # Run script for PR raised against "ProdRelease" branch or direct commit/merge into "UAT" branch
+                    sf org login jwt --client-id $CONSUMERKEYPROD --jwt-key-file Assets/server.key --username $USERNAMEPROD --instance-url $URLPROD
+                    echo "sfusername=$USERNAMEPROD" >> $GITHUB_ENV
+                else
+                    echo "No ORG found."
+                fi    
+            - name: Validation Using SFDX CLI
+              if: github.event_name == 'pull_request'
+              shell: pwsh
+              run: |
+                $SFORGUSERNAME = $env:sfusername
+                Write-Host "Validating on $SFORGUSERNAME..."
+                Write-Host "destrictive : $env:isDestructive"
+                $isDestructiveFound = $env:isDestructive
+                $TEST_TYPE = $env:TEST_TYPE
+                Write-Host "TEST_TYPE : $TEST_TYPE"
+                Write-Host "TEST_TYPE : $env:TEST_TYPE"
+                $srcFolder = "delta/src"
+                if ($isDestructiveFound -eq "True") {
+                  Write-Host "Validating Destructive changes"
+                  if (-Not (Test-Path -Path $srcFolder)) {
+                    Write-Host "Only Deletion"
+                    $sfCommand = "sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/package/package.xml -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
+                  } else {
+                    Write-Host "Deletion and Modification"
+                    $sfCommand = "sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/src/package.xml -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
+                  }
+                } else {
+                  if (Test-Path -Path $srcFolder) {
+                    Write-Host "Validating changes"
+                    $sfCommand = "sf project deploy start --source-dir delta/src/. -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
+                  } else {
+                    Write-Host "No Code found for validation."
+                    exit 0
+                  }
+                }
+                Write-Host "Executing: $sfCommand"
+                Invoke-Expression "& $sfCommand"
+            - name:  Deployment Using SFDX CLI
+              if: github.event_name == 'push'
+              shell: pwsh
+              run: |
+                $SFORGUSERNAME = $env:sfusername
+                Write-Host "Validating on $SFORGUSERNAME..."
+                Write-Host "destrictive : $env:isDestructive"
+                $isDestructiveFound = $env:isDestructive
+                $srcFolder = "delta/src"
+                if ($isDestructiveFound -eq "True") {
+                  Write-Host "Validating Destructive changes"
+                  if (-Not (Test-Path -Path $srcFolder)) {
+                    Write-Host "Only Deletion"
+                    sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/package/package.xml -o $SFORGUSERNAME -w 1000
+                  } else {
+                    Write-Host "Deletion and Modification"
+                    sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/src/package.xml -o $SFORGUSERNAME -w 1000
+                  }
+                } else {
+                  if (Test-Path -Path $srcFolder) {
+                    Write-Host "Validating changes"
+                    sf project deploy start --source-dir delta/src/. -o $SFORGUSERNAME -w 1000
+                  } else {
+                    Write-Host "No Code found for validation."
+                  }
+                }
