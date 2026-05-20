@@ -37,11 +37,12 @@ jobs:
               with:
                 fetch-depth: 0
             - name: Install dependencies
-              run: arch -arm64 brew install wget && arch -arm64 brew install --cask powershell@preview
-PWSH_PATH=$(find /opt/homebrew/Caskroom /usr/local/microsoft -name "pwsh" -type f 2>/dev/null | head -1)
-echo "Found pwsh at: $PWSH_PATH"
-sudo ln -sf "$PWSH_PATH" /usr/local/bin/pwsh
-pwsh --version
+              run: |
+                arch -arm64 brew install wget && arch -arm64 brew install --cask powershell@preview
+                PWSH_PATH=$(find /opt/homebrew/Caskroom /usr/local/microsoft -name "pwsh" -type f 2>/dev/null | head -1)
+                echo "Found pwsh at: $PWSH_PATH"
+                sudo ln -sf "$PWSH_PATH" /usr/local/bin/pwsh
+                pwsh --version
             # Now Install Salesforce CLI
             - name: 'Install Salesforce CLI'
               run: |
