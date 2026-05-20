@@ -37,13 +37,13 @@ jobs:
               with:
                 fetch-depth: 0
             - name: Install wget
-              run: sudo apt-get install -y wget
+              run: brew install wget
             # Now Install Salesforce CLI
             - name: 'Install Salesforce CLI'
               run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
+                  wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-darwin-arm64.tar.xz
                   mkdir -p ~/cli/sf
-                  tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
+                  tar xJf sf-darwin-arm64.tar.xz -C ~/cli/sf --strip-components 1
                   echo "$HOME/cli/sf/bin" >> $GITHUB_PATH
                   ~/cli/sf/bin/sfdx version
             
