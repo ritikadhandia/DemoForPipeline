@@ -17,7 +17,7 @@ on:
  
 jobs:
     Run-Validation:
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         env:
           CONSUMERKEYUAT: ${{ secrets.CONSUMERKEY }}
           USERNAMEUAT: ${{ secrets.USERNAME }}
@@ -36,12 +36,19 @@ jobs:
               uses: actions/checkout@v4
               with:
                 fetch-depth: 0
+            - name: Install dependencies
+              run: |
+                arch -arm64 brew install wget && arch -arm64 brew install --cask powershell@preview
+                PWSH_PATH=$(find /opt/homebrew/Caskroom /usr/local/microsoft -name "pwsh" -type f 2>/dev/null | head -1)
+                echo "Found pwsh at: $PWSH_PATH"
+                sudo ln -sf "$PWSH_PATH" /usr/local/bin/pwsh
+                pwsh --version
             # Now Install Salesforce CLI
             - name: 'Install Salesforce CLI'
               run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
+                  wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-darwin-arm64.tar.xz
                   mkdir -p ~/cli/sf
-                  tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
+                  tar xJf sf-darwin-arm64.tar.xz -C ~/cli/sf --strip-components 1
                   echo "$HOME/cli/sf/bin" >> $GITHUB_PATH
                   ~/cli/sf/bin/sfdx version
             
@@ -94,9 +101,9 @@ jobs:
                 
                 # Move package.xml to delta/src if needed
                 $sourcePath = "delta/package/package.xml"
-                $destinationPath = "delta/src"
+                $destinationPath = "delta/force-app/main/default"
                 if (Test-Path -Path $destinationPath) {
-                    Write-Host "Moving package.xml to delta/src"
+                    Write-Host "Moving package.xml to delta/force-app/main/default"
                     Move-Item -Path $sourcePath -Destination $destinationPath
                 }
             - name: Get PR Description
@@ -180,12 +187,12 @@ jobs:
                     $sfCommand = "sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/package/package.xml -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
                   } else {
                     Write-Host "Deletion and Modification"
-                    $sfCommand = "sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/src/package.xml -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
+                    $sfCommand = "sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/force-app/main/default/package.xml -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
                   }
                 } else {
                   if (Test-Path -Path $srcFolder) {
                     Write-Host "Validating changes"
-                    $sfCommand = "sf project deploy start --source-dir delta/src/. -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
+                    $sfCommand = "sf project deploy start --source-dir delta/force-app/main/default/. -o $SFORGUSERNAME -w 1000 $TEST_TYPE"
                   } else {
                     Write-Host "No Code found for validation."
                     exit 0
@@ -201,7 +208,7 @@ jobs:
                 Write-Host "Validating on $SFORGUSERNAME..."
                 Write-Host "destrictive : $env:isDestructive"
                 $isDestructiveFound = $env:isDestructive
-                $srcFolder = "delta/src"
+                $srcFolder = "delta/force-app/main/default"
                 if ($isDestructiveFound -eq "True") {
                   Write-Host "Validating Destructive changes"
                   if (-Not (Test-Path -Path $srcFolder)) {
@@ -209,12 +216,12 @@ jobs:
                     sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/package/package.xml -o $SFORGUSERNAME -w 1000
                   } else {
                     Write-Host "Deletion and Modification"
-                    sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/src/package.xml -o $SFORGUSERNAME -w 1000
+                    sf project deploy start --pre-destructive-changes delta/destructiveChanges/destructiveChanges.xml --manifest delta/force-app/main/default/package.xml -o $SFORGUSERNAME -w 1000
                   }
                 } else {
                   if (Test-Path -Path $srcFolder) {
                     Write-Host "Validating changes"
-                    sf project deploy start --source-dir delta/src/. -o $SFORGUSERNAME -w 1000
+                    sf project deploy start --source-dir delta/force-app/main/default/. -o $SFORGUSERNAME -w 1000
                   } else {
                     Write-Host "No Code found for validation."
                   }

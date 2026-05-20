@@ -1,6 +1,6 @@
 {
     "fileVersion": 0,
-    "serverMaxRevisionCounter": 3182,
+    "serverMaxRevisionCounter": 15911,
     "sourceMembers": {
         "ExperienceBundle__SDO_Partner_Central1": {
             "memberType": "ExperienceBundle",
@@ -17,6 +17,198 @@
         "PermissionSet__sfdcInternalInt__sfdc_accelerate_dms": {
             "memberType": "PermissionSet",
             "serverRevisionCounter": 89,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "Profile__Admin": {
+            "memberType": "Profile",
+            "serverRevisionCounter": 15736,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "ApexClass__TestPipeline": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 7327,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "ApexClass__TestApex": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 15737,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "ExperienceBundle__SDO_Consumer1": {
+            "memberType": "ExperienceBundle",
+            "serverRevisionCounter": 15769,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "ExperienceBundle__SDO_Professional1": {
+            "memberType": "ExperienceBundle",
+            "serverRevisionCounter": 15741,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__SDO_Maps_All_Permissions": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15879,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__SDO_Service_All_Permissions": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15702,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__SDO_Service_Einstein_for_Service": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15662,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__SDO_B2BCommerce_Base": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15728,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__SDO_B2BCommerce_Base_Buyer": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15715,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__CopilotSalesforceAdminPSG": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15706,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__CopilotSalesforceUserPSG": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15709,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__AgentforceServiceAgentUserPsg": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15904,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__Manage_ASC_Analytics": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15897,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__xDO_DataCloud_Base_PSG": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15894,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__GeneralUsers": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15718,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__ServiceUsers": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15686,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__SalesUsers": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15657,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__Marketing_Intelligence_Admin": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15909,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__SDO_SCOM_Partner_Base_Access": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15677,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__SalesManagementAgentUserPsg": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15900,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__SalesManagementUserPsg": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15911,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "PermissionSetGroup__force__SalesWorkspacePSG": {
+            "memberType": "PermissionSetGroup",
+            "serverRevisionCounter": 15902,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/SDO_D2C_Commerce_Enhanced1.sfdc_cms__view/cart": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15837,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/SDO_D2C_Commerce_Enhanced1.sfdc_cms__view/Wishlist": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15836,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/SDO_D2C_Commerce_Enhanced1.sfdc_cms__view/product": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15839,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/SDO_D2C_Commerce_Enhanced1.sfdc_cms__view/category": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15838,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/SDO_D2C_Commerce_Enhanced1.sfdc_cms__view/search": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15840,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/ESW_SDO_Messaging_for_Web_17786059094701.sfdc_cms__view/newsDetail": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15875,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/ESW_SDO_Messaging_for_Web_17786059094701.sfdc_cms__view/home": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15876,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/ESW_SDO_Messaging_for_Web_17786059094701.sfdc_cms__view/serviceNotAvailable": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15877,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "DigitalExperience__site/ESW_SDO_Messaging_for_Web_17786059094701.sfdc_cms__view/error": {
+            "memberType": "DigitalExperience",
+            "serverRevisionCounter": 15874,
             "lastRetrievedFromServer": null,
             "isNameObsolete": false
         }
