@@ -37,7 +37,7 @@ jobs:
               with:
                 fetch-depth: 0
             - name: Install dependencies
-              run: brew install wget && brew install --cask powershell@preview
+              run: brew install wget && brew install --cask powershell@preview && sudo ln -sf /usr/local/microsoft/powershell/7-preview/pwsh /usr/local/bin/pwsh
             # Now Install Salesforce CLI
             - name: 'Install Salesforce CLI'
               run: |
